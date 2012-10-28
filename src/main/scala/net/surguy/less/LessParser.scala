@@ -28,21 +28,37 @@ class LessParser extends RegexParsers {
   def property: Parser[Property] = "[\\w-]+".r ^^ { s => Property(s) }
   def value: Parser[Value] = "[^;}]+".r ^^ { s => Value(s) }
 
-//  stylesheet  : [ CDO | CDC | S | statement ]*;
-//  statement   : ruleset | at-rule;
-//  at-rule     : ATKEYWORD S* any* [ block | ';' S* ];
-//  block       : '{' S* [ any | block | ATKEYWORD S* | ';' S* ]* '}' S*;
-//  ruleset     : selector? '{' S* declaration? [ ';' S* declaration? ]* '}' S*;
-//  selector    : any+;
-//  declaration : property S* ':' S* value;
-//  property    : IDENT;
-//  value       : [ any | block | ATKEYWORD S* ]+;
-//  any         : [ IDENT | NUMBER | PERCENTAGE | DIMENSION | STRING
-//  | DELIM | URI | HASH | UNICODE-RANGE | INCLUDES
-//  | DASHMATCH | ':' | FUNCTION S* [any|unused]* ')'
-//  | '(' S* [any|unused]* ')' | '[' S* [any|unused]* ']'
-//  ] S*;
-//  unused      : block | ATKEYWORD S* | ';' S* | CDO S* | CDC S*;
+//      CSS 2.1 grammar from http://www.w3.org/TR/CSS21/grammar.html
+//  stylesheet : [ CHARSET_SYM STRING ';' ]? [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
+//        [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
+//  import : IMPORT_SYM S* [STRING|URI] S* media_list? ';' S* ;
+//  media : MEDIA_SYM S* media_list '{' S* ruleset* '}' S* ;
+//  media_list : medium [ COMMA S* medium]* ;
+//  medium : IDENT S* ;
+//  page : PAGE_SYM S* pseudo_page? '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
+//  pseudo_page : ':' IDENT S* ;
+//  operator : '/' S* | ',' S* ;
+//  combinator : '+' S* | '>' S* ;
+//  unary_operator : '-' | '+' ;
+//  property : IDENT S* ;
+//  ruleset : selector [ ',' S* selector ]* '{' S* declaration? [ ';' S* declaration? ]* '}' S* ;
+//  selector : simple_selector [ combinator selector | S+ [ combinator? selector ]? ]? ;
+//  simple_selector : element_name [ HASH | class | attrib | pseudo ]* | [ HASH | class | attrib | pseudo ]+ ;
+//  class : '.' IDENT ;
+//  element_name : IDENT | '*' ;
+//  attrib : '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']' ;
+//  pseudo : ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ] ;
+//  declaration : property ':' S* expr prio? ;
+//  prio : IMPORTANT_SYM S* ;
+//  expr : term [ operator? term ]* ;
+//  term : unary_operator?
+//        [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* | TIME S* | FREQ S* ]
+//        | STRING S* | IDENT S* | URI S* | hexcolor | function ;
+//  function : FUNCTION S* expr ')' S* ;
+//  /* There is a constraint on the color that it must have either 3 or 6 hex-digits (i.e., [0-9a-fA-F])
+//     after the "#"; e.g., "#000" is OK, but "#abcd" is not. */
+//  hexcolor : HASH S* ;
+
 }
 
 case class Stylesheet(rules: Seq[Ruleset])
