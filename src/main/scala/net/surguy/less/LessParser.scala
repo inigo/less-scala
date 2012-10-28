@@ -7,7 +7,7 @@ import util.parsing.combinator.RegexParsers
  *
  * LESS is a superset of CSS, so this will also parse CSS.
  */
-class LessParser extends RegexParsers {
+object LessParser extends RegexParsers {
 
   def parse(lessText : String):ParseResult[Stylesheet] = parseAll(stylesheet, lessText)
 
