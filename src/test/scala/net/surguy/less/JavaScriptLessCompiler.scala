@@ -6,7 +6,7 @@ import org.mozilla.javascript.tools.shell._
 import io.Source
 
 /**
- * @todo Add some documentation!
+ * Use the JavaScript Less compiler to convert a Less file into CSS.
  *
  * This is based on the "LessCompiler" class in the Play Framework code, and is used under the Apache 2 License.
  */

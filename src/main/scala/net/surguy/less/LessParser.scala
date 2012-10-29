@@ -66,12 +66,13 @@ object LessParser extends RegexParsers {
 
 }
 
-case class Stylesheet(directies: Seq[Directive], rules: Seq[Ruleset])
-case class Directive(directive: DirectiveTerm)
-case class Ruleset(selector: Selector, declarations: Seq[Declaration])
-case class Selector(terms: Seq[SelectorTerm])
-case class Declaration(property: Property, value: Value)
-case class Value(value: String)
-case class SelectorTerm(text: String)
-case class Property(text: String)
-case class DirectiveTerm(text: String)
+sealed abstract class Css
+case class Stylesheet(directies: Seq[Directive], rules: Seq[Ruleset]) extends Css
+case class Directive(directive: DirectiveTerm) extends Css
+case class Ruleset(selector: Selector, declarations: Seq[Declaration]) extends Css
+case class Selector(terms: Seq[SelectorTerm]) extends Css
+case class Declaration(property: Property, value: Value) extends Css
+case class Value(value: String) extends Css
+case class SelectorTerm(text: String) extends Css
+case class Property(text: String) extends Css
+case class DirectiveTerm(text: String) extends Css
