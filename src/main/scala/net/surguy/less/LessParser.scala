@@ -25,7 +25,7 @@ object LessParser extends RegexParsers {
   def selector : Parser[Selector] = rep(selectorTerm) ^^
     { case selectorTerms: Seq[SelectorTerm] => Selector(selectorTerms) }
 
-  def selectorTerm : Parser[SelectorTerm] = "[.:#()\\w\\-]+".r ^^ { s => SelectorTerm(s) }
+  def selectorTerm : Parser[SelectorTerm] = "[.:\\[\\]*>~'\"=^$\\+#()\\w\\-]+".r ^^ { s => SelectorTerm(s) }
 
   def declaration: Parser[Declaration] = property ~ ":" ~ value <~ opt(";") ^^
     { case (property: Property) ~ ":" ~ (value: Value)  => Declaration(property, value) }
