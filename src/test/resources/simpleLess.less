@@ -1,0 +1,7 @@
+@base: #f938ab;
+
+.myBackground(@col) { background-color: @col; }
+.box {
+  color: saturate(@base, 5%);
+  div { .myBackground("red")}
+}

@@ -127,6 +127,7 @@ object JavaScriptLessCompiler {
     }
   }
 
+  // Note that these functions are used from EcmaScript via Rhino
   def readContent(file: File) = Source.fromFile(file).getLines().mkString("\n").replace("\r", "")
   def resolve(originalSource: File, imported: String) = new File(originalSource.getParentFile, imported)
 
