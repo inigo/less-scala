@@ -49,6 +49,12 @@ class LessParserTest extends Specification with ParserMatchers {
     "recognize multiple declarations" in { ruleset must succeedOn("a { font-weight: bold; text-decoration: underline; }") }
   }
 
+  "Parsing directives" should {
+    "recognize simple imports" in { directive must succeedOn("@import 'test.css';")  }
+    "recognize imports with media queries" in { directive must succeedOn("@import 'test.css' projection,tv;")  }
+    "not consume rules" in { directive must failOn("a { font-weight: bold; }")  }
+  }
+
   "Parsing complete CSS files" should {
     "work for minimal CSS" in { stylesheet(read("minimal.less")) must beASuccess }
     "work for simple CSS" in { stylesheet(read("simple.less")) must beASuccess }
