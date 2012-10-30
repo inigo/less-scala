@@ -5,7 +5,7 @@ package net.surguy.less
  *
  * @author Inigo Surguy
  */
-class Colors {
+object Colors {
   val names = values.keySet
   val values = Map(
     "aliceblue" -> "#f0f8ff",
