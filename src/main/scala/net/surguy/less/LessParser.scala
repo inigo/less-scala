@@ -27,11 +27,11 @@ object LessParser extends RegexParsers {
 
   def selectorTerm : Parser[SelectorTerm] = "[.:\\[\\]*>~'\"=^$\\+#()\\w\\-]+".r ^^ { s => SelectorTerm(s) }
 
-  def declaration: Parser[Declaration] = property ~ ":" ~ value <~ opt(";") ^^
+  def declaration: Parser[Declaration] = property ~ ":" ~ (color | value) <~ opt(";") ^^
     { case (property: Property) ~ ":" ~ (value: Value)  => Declaration(property, value) }
 
   def property: Parser[Property] = "[\\w-]+".r ^^ { s => Property(s) }
-  def value: Parser[Value] = "[^;}]+".r ^^ { s => Value(s) }
+  def value: Parser[SimpleValue] = "[^;}]+".r ^^ { s => SimpleValue(s) }
 
   def comment: Parser[Comment] = "/*" ~> ".*(?=\\*/)".r <~ "*/" ^^ { s => Comment(s)  }
 
@@ -45,7 +45,7 @@ object LessParser extends RegexParsers {
   def rgbaColor: Parser[RgbaColor] = "rgba(" ~> "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r <~ ")" ^^
     { case (r: String) ~ "," ~ (g: String) ~ "," ~ (b:String) ~ "," ~ (a:String) => RgbaColor(r, g, b, a)  }
   def hashColor: Parser[HashColor] = "#" ~> "\\w+".r ^^ { s => HashColor(s) }
-  def namedColor: Parser[NamedColor] = "\\w+".r ^^ { s => NamedColor(s) }
+  def namedColor: Parser[NamedColor] = ("("+Colors.names.mkString("|")+")").r ^^ { s => NamedColor(s) }
 
   //      CSS 2.1 grammar from http://www.w3.org/TR/CSS21/grammar.html
 //  stylesheet : [ CHARSET_SYM STRING ';' ]? [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
@@ -86,14 +86,16 @@ case class Directive(directive: DirectiveTerm) extends Css
 case class Ruleset(selector: Selector, declarations: Seq[Declaration]) extends Css
 case class Selector(terms: Seq[SelectorTerm]) extends Css
 case class Declaration(property: Property, value: Value) extends Css
-case class Value(value: String) extends Css
 case class SelectorTerm(text: String) extends Css
 case class Property(text: String) extends Css
 case class DirectiveTerm(text: String) extends Css
 case class Comment(text: String) extends Css
 case class Variable(name: String, value: String) extends Css
 
-sealed abstract class Color extends Css
+sealed abstract class Value extends Css
+case class SimpleValue(value: String) extends Value
+
+sealed abstract class Color extends Value
 case class RgbColor(r: String, g: String, b: String) extends Color
 case class RgbaColor(r: String, g: String, b: String, a: String) extends Color
 case class HashColor(value: String) extends Color

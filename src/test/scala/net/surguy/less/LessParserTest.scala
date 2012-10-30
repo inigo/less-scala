@@ -70,6 +70,7 @@ class LessParserTest extends Specification with ParserMatchers {
     "parse colours in hash format" in { color must succeedOn("#f0f0f0").withResult(HashColor("f0f0f0")) }
     "parse colours in short hash format" in { color must succeedOn("#fff").withResult(HashColor("fff")) }
     "parse colours in named format" in { color must succeedOn("green").withResult(NamedColor("green")) }
+    "not parse non-named-colours" in { color must failOn("miasmic") }
   }
 
   /* ----- Less-specific tests ------ */

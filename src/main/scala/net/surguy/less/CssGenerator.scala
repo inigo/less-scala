@@ -12,8 +12,9 @@ object CssGenerator {
     case Directive(directive) => directive.text
     case Ruleset(selector, declarations) => output(selector) + " { " + declarations.map(output).mkString + "}"
     case Selector(terms) => terms.map(_.text).mkString(" ")
-    case Declaration(property, value) => property.text + ": " + value.value.trim + "; "
+    case Declaration(property, value) => property.text + ": " + output(value) + "; "
 
+    case SimpleValue(v) => v.trim
     case RgbColor(r, g, b) => "rgb(%s,%s,%s)".format(r, g, b)
     case RgbaColor(r, g, b, a) => "rgba(%s,%s,%s,%s)".format(r, g, b, a)
     case NamedColor(name) => toRgb(Colors.values(name).substring(1))
