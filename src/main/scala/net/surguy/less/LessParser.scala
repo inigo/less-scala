@@ -33,7 +33,12 @@ object LessParser extends RegexParsers {
   def property: Parser[Property] = "[\\w-]+".r ^^ { s => Property(s) }
   def value: Parser[Value] = "[^;}]+".r ^^ { s => Value(s) }
 
-//      CSS 2.1 grammar from http://www.w3.org/TR/CSS21/grammar.html
+  def comment: Parser[Comment] = "/*" ~> ".*".r <~ "*/" ^^ { s => Comment(s)  }
+
+  def variable: Parser[Variable] = "@" ~> property ~ ":" ~ value <~ ";" ^^
+    { case (property: Property) ~ ":" ~ (value: Value) => Variable(property.text, value.value)   }
+
+  //      CSS 2.1 grammar from http://www.w3.org/TR/CSS21/grammar.html
 //  stylesheet : [ CHARSET_SYM STRING ';' ]? [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
 //        [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
 //  import : IMPORT_SYM S* [STRING|URI] S* media_list? ';' S* ;
@@ -76,3 +81,5 @@ case class Value(value: String) extends Css
 case class SelectorTerm(text: String) extends Css
 case class Property(text: String) extends Css
 case class DirectiveTerm(text: String) extends Css
+case class Comment(text: String) extends Css
+case class Variable(name: String, value: String) extends Css

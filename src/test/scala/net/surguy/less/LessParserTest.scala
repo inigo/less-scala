@@ -60,4 +60,35 @@ class LessParserTest extends Specification with ParserMatchers {
     "work for simple CSS" in { stylesheet(read("simple.less")) must beASuccess }
   }
 
+  "Parsing comments" should {
+    "recognize standard CSS comments" in { comment must succeedOn("/* Some comment */") }
+  }
+
+  /* ----- Less-specific tests ------ */
+
+  "Parsing variables" should {
+    "recognize simple variables" in { variable must succeedOn("@nice-blue: #5B83AD;")  }
+    "recognize variables with + operator" in { variable must succeedOn("@light-blue: (@nice-blue + #111);")  }
+    "recognize variables with - operator" in { variable must succeedOn("@light-blue: (@nice-blue - #111);")  }
+    "recognize variables with * operator" in { variable must succeedOn("@light-blue: (@base * 2);")  }
+    "recognize variables with / operator" in { variable must succeedOn("@light-blue: (@base / 2);")  }
+    "recognize variables with brackets" in { variable must succeedOn("@light-blue: ((@base / 2) * 2);")  }
+    "recognize variables with units" in { variable must succeedOn("@var: (1px + 5);")  }
+
+    "recognize variable references" in { ruleset must succeedOn("#header { color: @light-blue; }") }
+    "recognize variable variable references" in { ruleset must succeedOn("#header { color: @@someColor; }") }
+    "recognize variables in selectors" in { ruleset must succeedOn(".@{someVar} { color: black; }") }
+  }
+
+  "Parsing mixins" should {
+    "allow inclusion of simple mixins" in { ruleset must succeedOn("table { .tbl; }") }
+    "allow inclusion of mixins and rules together" in { ruleset must succeedOn("table { .tbl; font-weight: bold; }") }
+    "allow inclusion of parametric mixins" in { ruleset must succeedOn("table { .tbl(4px); }") }
+  }
+
+  "Guard expressions" should {
+    "work with conditionals" in { ruleset must succeedOn(".mixin (@a) when (lightness(@a) >= 50%) { color: black;}") }
+    "work without a conditional" in { ruleset must succeedOn(".truth (@a) when (@a) { color: red; }") }
+  }
+
 }
