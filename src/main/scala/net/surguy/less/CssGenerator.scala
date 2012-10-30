@@ -15,9 +15,11 @@ object CssGenerator {
     case Declaration(property, value) => property.text + ": " + output(value) + "; "
 
     case SimpleValue(v) => v.trim
-    case RgbColor(r, g, b) => "rgb(%s,%s,%s)".format(r, g, b)
-    case RgbaColor(r, g, b, a) => "rgba(%s,%s,%s,%s)".format(r, g, b, a)
-    case NamedColor(name) => toRgb(Colors.values(name).substring(1))
+//    case RgbColor(r, g, b) => "rgb(%s,%s,%s)".format(r, g, b)
+//    case RgbaColor(r, g, b, a) => "rgba(%s,%s,%s,%s)".format(r, g, b, a)
+    case col: RgbColor => toHashColor(col)
+    case col: RgbaColor => toHashColor(col)
+    case NamedColor(name) => name
     case HashColor(value) => toRgb(value)
   }
 
@@ -32,5 +34,9 @@ object CssGenerator {
       case _ => "#"+hash
     }
   }
+
+  def toHashColor(col: RgbColor) = "#"+hex(col.r)+hex(col.g)+hex(col.b)
+  def toHashColor(col: RgbaColor) = "#"+hex(col.r)+hex(col.g)+hex(col.b)+hex(col.a)
+  private def hex(s: String) = "%02X".format(s.toInt).toLowerCase // Lowercase because that's what Less.js does
 
 }

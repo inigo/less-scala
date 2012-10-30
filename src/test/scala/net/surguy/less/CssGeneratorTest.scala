@@ -18,10 +18,17 @@ class CssGeneratorTest extends Specification{
     "retain other hash values" in { toRgb("12") mustEqual "#12" }
   }
 
+  "Converting RGB to hashes" should {
+    "convert rgb to hash" in { toHashColor(RgbColor("2","128","255")) mustEqual "#0280ff" }
+    "convert rgba to hash" in { toHashColor(RgbaColor("0","128","255","1")) mustEqual "#0080ff01" }
+  }
+
   "Generating CSS output" should {
-    "produce RGB values in place of named colours" in { output(NamedColor("red")) mustEqual "rgb(255,0,0)"}
+//    "produce RGB values in place of named colours" in { output(NamedColor("red")) mustEqual "rgb(255,0,0)"}
+    "retain colour names for named colours" in { output(NamedColor("red")) mustEqual "red"}
     "produce RGB values in place of hash colours" in { output(HashColor("ff0000")) mustEqual "rgb(255,0,0)"}
-    "produce RGB values from RGB colours" in { output(RgbColor("255","0","0")) mustEqual "rgb(255,0,0)"}
+//    "produce RGB values from RGB colours" in { output(RgbColor("255","0","0")) mustEqual "rgb(255,0,0)"}
+    "produce hash values from RGB colours" in { output(RgbColor("255","0","0")) mustEqual "#ff0000"}
   }
 
 }
