@@ -33,7 +33,7 @@ object LessParser extends RegexParsers {
   def property: Parser[Property] = "[\\w-]+".r ^^ { s => Property(s) }
   def value: Parser[Value] = "[^;}]+".r ^^ { s => Value(s) }
 
-  def comment: Parser[Comment] = "/*" ~> ".*".r <~ "*/" ^^ { s => Comment(s)  }
+  def comment: Parser[Comment] = "/*" ~> ".*(?=\\*/)".r <~ "*/" ^^ { s => Comment(s)  }
 
   def variable: Parser[Variable] = "@" ~> property ~ ":" ~ value <~ ";" ^^
     { case (property: Property) ~ ":" ~ (value: Value) => Variable(property.text, value.value)   }
