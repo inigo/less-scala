@@ -14,8 +14,8 @@ object LessParser extends RegexParsers {
   def stylesheet : Parser[Stylesheet] = rep(directive) ~ rep( ruleset ) ^^
     { case (directives: Seq[Directive]) ~ (rules : Seq[Ruleset]) => Stylesheet(directives, rules) }
 
-  def directive: Parser[Directive] = "@" ~ directiveTerm ~ ";" ^^
-    { case "@" ~ (directive: DirectiveTerm) ~ ";" => Directive(directive) }
+  def directive: Parser[Directive] = "@" ~> directiveTerm <~ ";" ^^
+    { case directive: DirectiveTerm => Directive(directive) }
 
   def directiveTerm: Parser[DirectiveTerm] = "[^;]+".r ^^ { s => DirectiveTerm(s) }
 
@@ -38,10 +38,12 @@ object LessParser extends RegexParsers {
   def variable: Parser[Variable] = "@" ~> property ~ ":" ~ value <~ ";" ^^
     { case (property: Property) ~ ":" ~ (value: Value) => Variable(property.text, value.value)   }
 
-  def color: Parser[Color] = (rgbColor | hashColor | namedColor) ^^ { case (color: Color) => color }
+  def color: Parser[Color] = (rgbaColor | rgbColor | hashColor | namedColor) ^^ { case (color: Color) => color }
 
-  def rgbColor: Parser[RgbColor] = "rgb(" ~ "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r ~ ")" ^^
-    { case "rgb(" ~ (r: String) ~ "," ~ (g: String) ~ "," ~ (b:String) ~ ")" => RgbColor(r, g, b)  }
+  def rgbColor: Parser[RgbColor] = "rgb(" ~> "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r <~ ")" ^^
+    { case (r: String) ~ "," ~ (g: String) ~ "," ~ (b:String)  => RgbColor(r, g, b)  }
+  def rgbaColor: Parser[RgbaColor] = "rgba(" ~> "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r <~ ")" ^^
+    { case (r: String) ~ "," ~ (g: String) ~ "," ~ (b:String) ~ "," ~ (a:String) => RgbaColor(r, g, b, a)  }
   def hashColor: Parser[HashColor] = "#" ~> "\\w+".r ^^ { s => HashColor(s) }
   def namedColor: Parser[NamedColor] = "\\w+".r ^^ { s => NamedColor(s) }
 
@@ -93,5 +95,6 @@ case class Variable(name: String, value: String) extends Css
 
 sealed abstract class Color extends Css
 case class RgbColor(r: String, g: String, b: String) extends Color
+case class RgbaColor(r: String, g: String, b: String, a: String) extends Color
 case class HashColor(value: String) extends Color
 case class NamedColor(name: String) extends Color

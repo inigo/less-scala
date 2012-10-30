@@ -66,6 +66,7 @@ class LessParserTest extends Specification with ParserMatchers {
 
   "Parsing colours" should {
     "parse colours in rgb format" in { color must succeedOn("rgb(10,20,30)").withResult(RgbColor("10","20","30")) }
+    "parse colours in rgba format" in { color must succeedOn("rgba(10,20,30, 40)").withResult(RgbaColor("10","20","30","40")) }
     "parse colours in hash format" in { color must succeedOn("#f0f0f0").withResult(HashColor("f0f0f0")) }
     "parse colours in short hash format" in { color must succeedOn("#fff").withResult(HashColor("fff")) }
     "parse colours in named format" in { color must succeedOn("green").withResult(NamedColor("green")) }
