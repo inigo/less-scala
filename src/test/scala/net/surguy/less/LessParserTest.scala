@@ -64,6 +64,13 @@ class LessParserTest extends Specification with ParserMatchers {
     "recognize standard CSS comments" in { comment must succeedOn("/* Some comment */") }
   }
 
+  "Parsing colours" should {
+    "parse colours in rgb format" in { color must succeedOn("rgb(10,20,30)").withResult(RgbColor("10","20","30")) }
+    "parse colours in hash format" in { color must succeedOn("#f0f0f0").withResult(HashColor("f0f0f0")) }
+    "parse colours in short hash format" in { color must succeedOn("#fff").withResult(HashColor("fff")) }
+    "parse colours in named format" in { color must succeedOn("green").withResult(NamedColor("green")) }
+  }
+
   /* ----- Less-specific tests ------ */
 
   "Parsing variables" should {

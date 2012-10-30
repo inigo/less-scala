@@ -38,6 +38,13 @@ object LessParser extends RegexParsers {
   def variable: Parser[Variable] = "@" ~> property ~ ":" ~ value <~ ";" ^^
     { case (property: Property) ~ ":" ~ (value: Value) => Variable(property.text, value.value)   }
 
+  def color: Parser[Color] = (rgbColor | hashColor | namedColor) ^^ { case (color: Color) => color }
+
+  def rgbColor: Parser[RgbColor] = "rgb(" ~ "\\w+".r ~ "," ~ "\\w+".r ~ "," ~ "\\w+".r ~ ")" ^^
+    { case "rgb(" ~ (r: String) ~ "," ~ (g: String) ~ "," ~ (b:String) ~ ")" => RgbColor(r, g, b)  }
+  def hashColor: Parser[HashColor] = "#" ~> "\\w+".r ^^ { s => HashColor(s) }
+  def namedColor: Parser[NamedColor] = "\\w+".r ^^ { s => NamedColor(s) }
+
   //      CSS 2.1 grammar from http://www.w3.org/TR/CSS21/grammar.html
 //  stylesheet : [ CHARSET_SYM STRING ';' ]? [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
 //        [ [ ruleset | media | page ] [ CDO S* | CDC S* ]* ]* ;
@@ -83,3 +90,8 @@ case class Property(text: String) extends Css
 case class DirectiveTerm(text: String) extends Css
 case class Comment(text: String) extends Css
 case class Variable(name: String, value: String) extends Css
+
+sealed abstract class Color extends Css
+case class RgbColor(r: String, g: String, b: String) extends Color
+case class HashColor(value: String) extends Color
+case class NamedColor(name: String) extends Color
