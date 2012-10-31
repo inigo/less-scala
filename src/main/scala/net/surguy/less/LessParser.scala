@@ -37,8 +37,14 @@ object LessParser extends RegexParsers {
 
   def comment: Parser[Comment] = "/*" ~> ".*(?=\\*/)".r <~ "*/" ^^ { s => Comment(s)  }
 
-  def variable: Parser[Variable] = "@" ~> property ~ ":" ~ value <~ ";" ^^
-    { case (property: Property) ~ ":" ~ (value: Value) => Variable(property.text, value.value)   }
+  def variable: Parser[Variable] = variableName ~ ":" ~ variableValue <~ ";" ^^
+    { case (name: VariableName) ~ ":" ~ (value: VariableValue) => Variable(name, value)   }
+  def variableValue: Parser[VariableValue] = variableOperation | variableName | variableSimpleValue
+  def variableName: Parser[VariableName] = "@[\\w-]+".r ^^ { s => VariableName(s) }
+  def variableSimpleValue: Parser[VariableSimpleValue] = "[\\w\\-#]+".r ^^ { s => VariableSimpleValue(s) }
+  def variableOperation: Parser[VariableOperation] = "(" ~> variableValue ~ operator ~ variableValue <~ ")" ^^
+    { case (value1: VariableValue) ~ (op: Operator) ~ (value2: VariableValue) => VariableOperation(value1, op, value2) }
+  def operator: Parser[Operator] = "[+*/\\-]".r ^^ { s => Operator(s) }
 
   def color: Parser[Color] = (rgbaColor | rgbColor | hashColor | namedColor) ^^ { case (color: Color) => color }
 
@@ -60,7 +66,14 @@ case class SelectorTerm(text: String) extends Css
 case class Property(text: String) extends Css
 case class DirectiveTerm(text: String) extends Css
 case class Comment(text: String) extends Css
-case class Variable(name: String, value: String) extends Css
+
+case class Variable(name: VariableName, value: VariableValue) extends Css
+case class VariableName(name: String) extends VariableValue
+// @todo Probably the same as other values - e.g. for properties
+sealed abstract class VariableValue extends Css
+case class VariableSimpleValue(name: String) extends VariableValue
+case class Operator(op: String) extends Css
+case class VariableOperation(val1: VariableValue, op: Operator, val2: VariableValue) extends VariableValue
 
 sealed abstract class Value extends Css
 case class SimpleValue(value: String) extends Value
