@@ -11,6 +11,7 @@ object LessParser extends RegexParsers {
 
   def parse(lessText : String):ParseResult[Stylesheet] = parseAll(stylesheet, lessText)
 
+  // @todo Is the comment match only working due to type erasure?
   def stylesheet : Parser[Stylesheet] = rep( (comment | directive) ) ~ rep( (comment | ruleset) ) ^^
     { case (directives: Seq[Directive]) ~ (rules : Seq[Ruleset]) => Stylesheet(directives, rules) }
 
@@ -19,6 +20,7 @@ object LessParser extends RegexParsers {
 
   def directiveTerm: Parser[DirectiveTerm] = "[^;]+".r ^^ { s => DirectiveTerm(s) }
 
+  // @todo Is the comment match only working due to type erasure?
   def ruleset : Parser[Ruleset] = selector ~ "{" ~ rep( (comment | declaration)) ~ "}" ^^
     { case (selector: Selector) ~ "{" ~ (declarations : Seq[Declaration]) ~ "}" => Ruleset(selector, declarations) }
 
