@@ -49,7 +49,7 @@ object LessParser extends RegexParsers {
 }
 
 sealed abstract class Css
-case class Stylesheet(directies: Seq[Directive], rules: Seq[Ruleset]) extends Css
+case class Stylesheet(directives: Seq[Directive], rules: Seq[Ruleset]) extends Css
 case class Directive(directive: DirectiveTerm) extends Css
 case class Ruleset(selector: Selector, declarations: Seq[Declaration]) extends Css
 case class Selector(terms: Seq[SelectorTerm]) extends Css
