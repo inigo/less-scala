@@ -62,6 +62,8 @@ class LessParserTest extends Specification with ParserMatchers {
 
   "Parsing comments" should {
     "recognize standard CSS comments" in { comment must succeedOn("/* Some comment */") }
+    "recognize comments in rules" in { ruleset must succeedOn("a { color: black; /* Some comment */ }")}
+    "recognize comments before rules" in { stylesheet must succeedOn("/* Some comment */ a { color: black; }")}
   }
 
   "Parsing colours" should {

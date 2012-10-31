@@ -11,7 +11,7 @@ object LessParser extends RegexParsers {
 
   def parse(lessText : String):ParseResult[Stylesheet] = parseAll(stylesheet, lessText)
 
-  def stylesheet : Parser[Stylesheet] = rep(directive) ~ rep( ruleset ) ^^
+  def stylesheet : Parser[Stylesheet] = rep( (comment | directive) ) ~ rep( (comment | ruleset) ) ^^
     { case (directives: Seq[Directive]) ~ (rules : Seq[Ruleset]) => Stylesheet(directives, rules) }
 
   def directive: Parser[Directive] = "@" ~> directiveTerm <~ ";" ^^
@@ -19,7 +19,7 @@ object LessParser extends RegexParsers {
 
   def directiveTerm: Parser[DirectiveTerm] = "[^;]+".r ^^ { s => DirectiveTerm(s) }
 
-  def ruleset : Parser[Ruleset] = selector ~ "{" ~ rep(declaration) ~ "}" ^^
+  def ruleset : Parser[Ruleset] = selector ~ "{" ~ rep( (comment | declaration)) ~ "}" ^^
     { case (selector: Selector) ~ "{" ~ (declarations : Seq[Declaration]) ~ "}" => Ruleset(selector, declarations) }
 
   def selector : Parser[Selector] = rep(selectorTerm) ^^
