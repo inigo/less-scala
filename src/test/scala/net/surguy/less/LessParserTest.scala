@@ -78,8 +78,10 @@ class LessParserTest extends Specification with ParserMatchers {
   /* ----- Less-specific tests ------ */
 
   "Parsing variables" should {
-    "recognize simple variables" in { variable must succeedOn("@nice-blue: #5B83AD;")  }
-    "recognize variables with + operator" in { variable must succeedOn("@light-blue: (@nice-blue + #111);")  }
+    "recognize simple variables" in { variable must succeedOn("@nice-blue: #5B83AD;").
+      withResult(Variable(VariableName("@nice-blue"), VariableSimpleValue("#5B83AD")))  }
+    "recognize variables with + operator" in { variable must succeedOn("@light-blue: (@nice-blue + #111);").
+      withResult(Variable(VariableName("@light-blue"), VariableOperation(VariableName("@nice-blue"), Operator("+"), VariableSimpleValue("#111")))) }
     "recognize variables with - operator" in { variable must succeedOn("@light-blue: (@nice-blue - #111);")  }
     "recognize variables with * operator" in { variable must succeedOn("@light-blue: (@base * 2);")  }
     "recognize variables with / operator" in { variable must succeedOn("@light-blue: (@base / 2);")  }
