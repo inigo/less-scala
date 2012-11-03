@@ -83,3 +83,5 @@ case class RgbColor(r: String, g: String, b: String) extends Color
 case class RgbaColor(r: String, g: String, b: String, a: String) extends Color
 case class HashColor(value: String) extends Color
 case class NamedColor(name: String) extends Color
+
+case object NullCss extends Css

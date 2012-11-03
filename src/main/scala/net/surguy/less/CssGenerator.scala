@@ -13,6 +13,7 @@ object CssGenerator {
     case Ruleset(selector, declarations) => output(selector) + " { " + declarations.map(output).mkString + "}"
     case Selector(terms) => terms.map(_.text).mkString(" ")
     case Declaration(property, value) => property.text + ": " + output(value) + "; "
+    case NullCss => ""
 
     case SimpleValue(v) => v.trim
 //    case RgbColor(r, g, b) => "rgb(%s,%s,%s)".format(r, g, b)
