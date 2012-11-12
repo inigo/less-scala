@@ -22,6 +22,7 @@ class LessParserTest extends Specification with ParserMatchers {
     "recognize attribute values containing" in { selector("a[href*='example.com']") must beASuccess }
     "recognize attribute values beginning" in { selector("a[href^='http']") must beASuccess }
     "recognize attribute values ending" in { selector("a[href$='.jpg']") must beASuccess }
+    "recognize URLs in attribute values" in { selector("a[href^=\"http://\"]") must beASuccess }
     "recognize attribute values with token" in { selector("a[title~='some']") must beASuccess }
     "chain multiple classes" in { selector("a.btn.important") must beASuccess }
     "support descendants" in { selector("body table a") must beASuccess }
@@ -41,10 +42,13 @@ class LessParserTest extends Specification with ParserMatchers {
     "recognize multiple values" in { declaration must succeedOn("font-family: 'Times New Roman', sans-serif") }
     "recognize urls" in { declaration must succeedOn("background-image: url('http://example.com/test.jpg?asd#value')") }
     "recognize counters" in { declaration must succeedOn("content: counter(chapter) \".\" counter(section) \" \";") }
+    "recognize urls after colours" in { declaration must succeedOn("background-image: url('http://example.com/test.jpg?asd#value')") }
+    "support values in quotes" in { declaration must succeedOn("content: \"#*%:&^,)!.(~*})\";") }
   }
 
   "Parsing rulesets" should {
     "recognize simple rules" in { ruleset must succeedOn("a { font-weight: bold; }") }
+    "support commas between selectors" in { ruleset must succeedOn("#all, #the, #same { color: blue; }") }
     "recognize rules without semi-colons" in { ruleset must succeedOn("a { font-weight: bold }") }
     "recognize multiple declarations" in { ruleset must succeedOn("a { font-weight: bold; text-decoration: underline; }") }
   }
@@ -52,6 +56,7 @@ class LessParserTest extends Specification with ParserMatchers {
   "Parsing directives" should {
     "recognize simple imports" in { directive must succeedOn("@import 'test.css';")  }
     "recognize imports with media queries" in { directive must succeedOn("@import 'test.css' projection,tv;")  }
+    "recognize media directives" in { directive must succeedOn("@media print { font-size: 3em; }")  }
     "not consume rules" in { directive must failOn("a { font-weight: bold; }")  }
   }
 
