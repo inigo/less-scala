@@ -12,7 +12,10 @@ class CompareJavaScriptToScalaTest extends Specification with ParserMatchers {
   private def getJsCss(name: String) = adjustWhitespace( JavaScriptLessCompiler.compile(getFile(name))._1 )
 
   private def read(name: String) = Source.fromInputStream( this.getClass.getResourceAsStream("/" + name) ).getLines().mkString("\n").trim
-  private def getScalaCss(name: String) = adjustWhitespace( CssGenerator.output( LessParser.parse(read(name)).get ) )
+  private def getScalaCss(name: String) = LessParser.parse(read(name)) match {
+    case LessParser.Success(s: Css, next) => adjustWhitespace(CssGenerator.output( s ))
+    case fail  => throw new RuntimeException("Could not parse "+name+" due to  "+fail)
+  }
 
   private def adjustWhitespace(s: String) = s.replaceAll("[\r\n ]+", " ").trim
 
@@ -24,6 +27,15 @@ class CompareJavaScriptToScalaTest extends Specification with ParserMatchers {
   "Processing the same file with the JavaScript and the Scala compilers" should {
     "create the same output for minimal CSS" in {  getScalaCss("minimal.less") mustEqual getJsCss("minimal.less")}
     "create the same output for simple CSS" in {  getScalaCss("simple.less") mustEqual getJsCss("simple.less")}
+  }
+
+  "Processing a directory of test files" should {
+    "successfully parse every file" in {
+      getFile("css").listFiles().foreach { f => getScalaCss("css/"+f.getName) mustEqual "" }
+    }
+    "create the same output from JavaScript and Scala for every file" in {
+      getFile("css").listFiles().foreach { f => { getScalaCss("css/"+f.getName) mustEqual getJsCss("css/"+f.getName)} }
+    }
   }
 
 }
