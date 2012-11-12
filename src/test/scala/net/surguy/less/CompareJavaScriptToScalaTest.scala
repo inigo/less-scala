@@ -19,6 +19,8 @@ class CompareJavaScriptToScalaTest extends Specification with ParserMatchers {
 
   private def adjustWhitespace(s: String) = s.replaceAll("[\r\n ]+", " ").trim
 
+  sequential
+
   "Parsing a file with the Less JavaScript parser" should {
     "produce CSS output for a simple CSS file" in { (getJsCss("minimal.less") must not).beNull }
     "produce CSS output for a simple Less file" in { (getJsCss("simpleLess.less") must not).beNull }
