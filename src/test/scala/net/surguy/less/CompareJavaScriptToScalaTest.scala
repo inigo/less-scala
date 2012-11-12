@@ -29,12 +29,21 @@ class CompareJavaScriptToScalaTest extends Specification with ParserMatchers {
     "create the same output for simple CSS" in {  getScalaCss("simple.less") mustEqual getJsCss("simple.less")}
   }
 
-  "Processing a directory of test files" should {
-    "successfully parse every file" in {
-      getFile("css").listFiles().foreach { f => getScalaCss("css/"+f.getName) mustEqual "" }
+  "Parsing existing CSS" should {
+    getFile("css").listFiles().foreach { f =>
+      ("successfully parse "+f.getName ) in { (getScalaCss("css/" + f.getName) must not).beNull }
     }
-    "create the same output from JavaScript and Scala for every file" in {
-      getFile("css").listFiles().foreach { f => { getScalaCss("css/"+f.getName) mustEqual getJsCss("css/"+f.getName)} }
+  }
+
+  "Using JavaScript to parse Less" should {
+    getFile("less").listFiles().filter(_.isFile).foreach { f =>
+      ("successfully parse "+f.getName ) in { (getJsCss("less/"+f.getName) must not).beNull }
+    }
+  }
+
+  "Converting existing Less to CSS" should {
+    getFile("less").listFiles().filter(_.isFile).foreach { f =>
+      ("create the same output from JavaScript and Scala for  "+f.getName ) in {getScalaCss("less/"+f.getName) mustEqual getJsCss("less/"+f.getName)}
     }
   }
 
